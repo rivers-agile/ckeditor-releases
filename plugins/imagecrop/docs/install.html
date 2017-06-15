@@ -1,0 +1,199 @@
+﻿<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>ImageCrop plugin</title>
+<link href="styles.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<h1>ImageCrop Plugin for CKEditor</h1>
+
+<h2>Introduction</h2>
+<p>This is a plugin for <a href="http://www.ckeditor.com">CKEditor</a> that allows to easily crop and resize the images when they are uploaded to the editor.</p>
+
+<h3 id="contact">Author:</h3>
+<p><a href="mailto:soporte@uritec.es">Uritec SL</a></p>
+
+<h3>Version history: </h3>
+<ol>
+	<li>1.0: 18-June-2014. First public version.</li>
+	<li>1.0.1: 29-June-2014. Format selector didn't work correctly. Improve translations. </li>
+	<li>1.0.2: Adjust CSS to avoid conflicts with existing classes in the page. Force lowercase in the filenames. </li>
+	<li>1.1.0: 12-October-2014. Big code reorganization. <br>
+		Usage of the "Pica" library for high quality image resizing<br>
+		Enable editing of existing images
+		</li>
+	<li>1.2.0: 26-November-2014. Define maximum dimensions so that images are automatically resized even if the user just presses OK. <br>
+			Handle correctly multiple images added at once
+		</li>
+	<li>1.2.1: 30-November-2014. Bug fixes for the configuration changes in 1.2.0<br>
+			Don't enable the context menu if the image is a cross-domain that can't be edited<br>
+			Updated Pica to 1.0.7
+		</li>
+	<li>1.2.2: 2-December-2014. Fixed bug to enable editing of existing base64 images (this feature is discouraged as it's really bad for the performance of the final page and it has known bugs in CKEditor)</li>
+	<li>1.3.0: 4-December-2014. Enable usage of the <a href="#CORS">CORS "crossOrigin" attribute</a> on images to allow editing of images hosted in another server<br>
+		Preserve alpha-transparency for Png (of course, you must save the image as .png)
+		</li>
+	<li>1.3.1: 4-December-2014. Avoid error if the config.imagecrop object hasn't been set<br>
+		Set the default set of format options to all the allowed ones
+		</li>
+	<li>1.3.2: Renamed the "dialog" folder to "dialog<b>s</b>" following the pattern of other plugins.<br>
+		Add protection to load correctly the dialog if Jcrop is already being used on the page<br>
+		Detect old versions of Jcrop that hides the image when going back
+		</li>
+	<li>1.3.3: Use the crossOrigin attribute only if present to avoid problems with some versions of Firefox
+		</li>
+
+	<li>1.3.4: 9-February-2015. German and French translations by Contens.de<br>
+		Protect usage of jQuery if there are other frameworks in the page like MooTools
+		</li>
+	<li>1.3.5: 23-June-2015. Adjust zoom automatically on start<br>
+		Start selection as big as possible
+		</li>
+	<li>1.3.6: If there's only one "cropsizes" entry and it has an "automatic" entry set to true, the dialog is skipped and the image resized automatically
+		</li>
+	<li>1.4.0: 27/01/2016. Display option to allow adjusting the final dimensions<br>
+			Checkbox to keep aspect ratio or allow free resizing from the sides<br>
+		</li>
+	<li>1.4.1: 24/02/2016. Initialize free crop with 10% instead of 100% to easily enable resizing<br>
+		</li>
+	<li>1.4.2: 18/04/2016. Provide "ImageCrop" button so it can be used in the main toolbar or with the ImageToolbar plugin. If you don't need it, you can remove it using the config.removeButtons entry.<br>
+			Update to Pica 2.0.2<br>
+		</li>
+	<li>1.4.3: 18/04/2016. Adjust conditional loading of jQuery to use https<br>
+		</li>
+	<li>1.4.4: 20/04/2016. Patch pica.min.js to avoid problems if DoJo is loaded and "define" exists<br>
+		</li>
+	<li>1.4.5: 05/05/2016. Improved logic to preserve desired aspect ration while changing final size<br>
+		</li>
+	<li>1.4.6: 26/07/2016. Avoid problem if there's a version of jQuery loaded too old
+		</li>
+	<li>1.5.0: 22/07/2016. Allow to enlarge the picture area if it's smaller than the desired final size<br>
+							Removed Chinese language file because it wasn't translated
+		</li>
+	<li>1.5.1: 27/07/2016. Skip extra steps after enlarging the canvas if there's no need to resize or crop<br>
+		</li>
+	<li>1.5.2: 25/08/2016. Protect code in case jQuery has been run as noConflict (eg: Drupal) and "$" doesn't exist.<br>
+							Use correctly height value in the maximumDimensions configuration<br>
+		</li>
+	<li>1.5.3: 21/09/2016. In Enlarge mode, Move pick color buttons to the same row as color preview<br>
+							Remove the dimensions from the buttons and leave them as tooltip
+		</li>
+</ol>
+
+<h2>Installation</h2>
+<h3>1. Copying the files</h3>
+<p>Extract the contents of the zip in you plugins directory, so it ends up like
+    this<br>
+    <!--<img src="installation.png" alt="Screenshot of installation" width="311" height="346" longdesc="#install">-->
+    </p>
+<pre id="--install">
+ckeditor\
+	...
+	images\
+	lang\
+	plugins\
+		...
+		imagecrop\
+			plugin.js
+			dialog\
+			docs\
+			lang\
+		...
+	skins\
+	themes\
+</pre>
+<h3>2. Adding it to CKEditor</h3>
+<p>Now add the plugin in your <em>config.js</em> or custom js configuration file like you did for the SimpleUploads, adding a comma:
+<code>config.extraPlugins='simpleuploads,imagecrop'; </code>
+</p>
+
+<h3>3. Configuration</h3>
+<p>The configuration is provided as a single "imagecrop" object in the configuration of each editor, example:</p>
+<code>// Configuration for ImageCrop
+config.imagecrop = {
+	cropsizes : [
+		{width:120, height:120, title:"120px square", name:"Thumbnail"},
+		{width:400, height:300, title:"400 * 300", name:"Content picture"},
+		{width:960, height:350, title:"960 * 350", name:"Big header"},
+		{width:0, height:0, title:"No restrictions", name:"Free crop"}
+		],
+
+	formats : [
+		{ title:"JPG - Low quality", value:"jpg60"},
+		{ title:"JPG - Normal quality", value:"jpg80", attributes:"selected"},
+		{ title:"JPG - High quality", value:"jpg90"},
+		{ title:"PNG (for texts)", value:"png"}
+		],
+
+	maximumDimensions : {width:1024, height:1024}
+};</code>
+
+
+<p>The <b>cropsizes</b> property defines the cropping sizes that you want to allow, you must add an array of objects. Each object has four properties:<br>
+"width": Final width of the resized area<br>
+"height": Final height of the resized area<br>
+"title": Tooltip that will be shown while hovering the button<br>
+"name": Text of the button that the user will see</p>
+<code>cropsizes : [
+	{width:80, height:80, title:"small thumbail (80x80)", name:"Thumbnail"},
+	{width:400, height:300, title:"400 * 300", name:"Content picture"},
+	{width:0, height:0, title:"No restrictions", name:"Free crop"}
+	]
+</code>
+<p>You can define as many options as you want, each one will be available as a button for the user to quickly select the final dimensions of the image.<br>
+If width and height are zero the user will be able to crop the image at any size</p>
+
+<p>After selecting the cropped area, the user has the option to select the quality that will be used to save the image, you can modify the available options with the <b>formats</b> property:</p>
+<code>formats : [
+	{ title:"JPG - Low quality", value:"jpg60"},
+	{ title:"JPG - Normal quality", value:"jpg80", attributes:"selected"},
+	{ title:"JPG - High quality", value:"jpg90"},
+	{ title:"PNG (for texts)", value:"png"}
+	],
+</code>
+<p>At the moment the maximum set of options is limited to the four ones provided above, you can remove any one that you don't like or change the default one</p>
+
+<p>Finally, if the user presses OK on the dialog without cropping the image you can force it to be resized to a maximum width and height (preserving the ratio) with the <b>maximumDimensions</b> setting</p>
+<code>maximumDimensions : {width:1024, height:1024}</code>
+
+<p id="CORS">CORS: In order to edit images hosted in another domain you'll need to enable the remote server to send the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image">CORS headers</a> when requested. That just allows the usage of the images, but in order to avoid misleading the users into thinking that they might be allowed to edit any image, ImageCrop will try to check if the editing will work when showing the context menu. Unfortunately to fully check if it works it might require a new request of the image, and at that time we can't change the context menu.<br>
+So if you know that you'll be working with a CORS enabled server, set the <b>skipCORScheck</b> property in the config.imagecrop object to true, that way the check won't be performed upon showing  the context menu and only when the user launches the editing dialog.</p>
+
+<p>disableEnlarge: In 1.5.0 we have added the option to enlarge the image canvas to fit better the desired size. If you don't want to provide this option, set disableEnlarge to true.</p>
+
+<h3>4. Use it</h3>
+<p>Clear your cache and reload your editor. <br>
+Now add an image (drag&amp;drop, take a screenshot and paste it, use the Upload button, ...), and the cropping dialog will popup:</p>
+<ul>
+	<li>If you just press OK then it will be uploaded without changes</li>
+	<li>If you select a size, then the cropping rectangle will appear that allows to select the area of interest in the picture<br>
+	By pressing Crop you can finally select the quality according to the options that you have allowed</li>
+</ul>
+
+<h3>5. Translations</h3>
+<p>To add a new translation open plugin.js and search for "translations", it's at line 6 and add your language (the example is based on adding Polish ('pl')
+  <code>    // translations
+    lang : 'en,es',</code>
+to<code>    // translations
+    lang : 'en,es,pl',</code></p>
+<p>
+Then in the lang folder copy the en.js to pl.js, edit that file and in the first line set your language:
+<code>CKEDITOR.addPluginLang( "imagecrop", "pl",</code>
+and finally, translate all the text between quotes :-)</p>
+<p>If you send it back to us, we will include it in the next versions.</p>
+
+<!--
+<h2>Final notes</h2>
+-->
+
+<h2>Disclaimers</h2>
+ImageCrop plugin is &copy; Uritec S.L.<br>
+SimpleUploads plugin is &copy; Alfonso Martínez de Lizarrondo<br>
+CKEditor is &copy; CKSource<br>
+jQuery is &copy; The jQuery Foundation.<br>
+jCrop is &copy; Tapmodo Interactive LLC<br>
+Pica is &copy; Vitaly Puzrin<br>
+</body>
+</html>
