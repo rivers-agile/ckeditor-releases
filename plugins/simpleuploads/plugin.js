@@ -1910,7 +1910,7 @@ https://bugzilla.mozilla.org/show_bug.cgi?id=454832
 		};
 
 		// CORS https://developer.mozilla.org/en-US/docs/HTTP/Access_control_CORS
-		xhr.withCredentials = true;
+		xhr.withCredentials = false;
 
 		return xhr;
 	}
@@ -1995,6 +1995,15 @@ https://bugzilla.mozilla.org/show_bug.cgi?id=454832
 				}
 			}
 		}
+
+
+    if (!data.extraHeaders)
+      data.extraHeaders = {};
+
+    data.extraHeaders['Authorization'] = 'Bearer ' + window.sessionStorage['wellSiteReport-token'];
+    data.extraHeaders['X-User-Id'] = window.sessionStorage['wellSiteReport-user_id'];
+    data.extraHeaders['X-User-Client'] = window.sessionStorage['wellSiteReport-client'];
+
 		if (data.extraHeaders) {
 			var headers = data.extraHeaders;
 			for (var header in headers) {
