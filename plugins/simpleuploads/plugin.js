@@ -1975,6 +1975,13 @@ https://bugzilla.mozilla.org/show_bug.cgi?id=454832
 
 		var inputName = data.inputName || getUploadInputName(editor);
 
+    if (!data.extraHeaders)
+      data.extraHeaders = {};
+
+    data.extraHeaders['Authorization'] = 'Bearer ' + window.sessionStorage['wellSiteReport-token'];
+    data.extraHeaders['X-User-Id'] = window.sessionStorage['wellSiteReport-user_id'];
+    data.extraHeaders['X-User-Client'] = window.sessionStorage['wellSiteReport-client'];
+
 		if (typeof data.file == 'string')
 			sendBase64File(data, xhr, inputName);
 		else
@@ -1995,14 +2002,6 @@ https://bugzilla.mozilla.org/show_bug.cgi?id=454832
 				}
 			}
 		}
-
-
-    if (!data.extraHeaders)
-      data.extraHeaders = {};
-
-    data.extraHeaders['Authorization'] = 'Bearer ' + window.sessionStorage['wellSiteReport-token'];
-    data.extraHeaders['X-User-Id'] = window.sessionStorage['wellSiteReport-user_id'];
-    data.extraHeaders['X-User-Client'] = window.sessionStorage['wellSiteReport-client'];
 
 		if (data.extraHeaders) {
 			var headers = data.extraHeaders;
