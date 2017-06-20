@@ -37,5 +37,5 @@ CKEDITOR.editorConfig = function( config ) {
 	config.removeDialogTabs = 'image:advanced;link:advanced';
 
 	//fileUploader **This url is placeholder, does not work currently**
-	config.filebrowserUploadUrl = API_URL + '/uploads';
+	config.filebrowserUploadUrl = 'API_URL' + '/uploads';
 };
