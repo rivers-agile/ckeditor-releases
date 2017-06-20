@@ -2042,6 +2042,15 @@ https://bugzilla.mozilla.org/show_bug.cgi?id=454832
 
 		xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + BOUNDARY);
 
+		if (data.extraHeaders) {
+			var headers = data.extraHeaders;
+			for (var header in headers) {
+				if ({}.hasOwnProperty.call(headers, header)) {
+					xhr.setRequestHeader(header, headers[header]);
+				}
+			}
+		}
+
 		var bufferData = new ArrayBuffer(req.length);
 		var ui8a = new Uint8Array(bufferData, 0);
 		for (var i = 0; i < req.length; i++)
